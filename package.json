@@ -11,7 +11,8 @@
     "start": "node bin/neonrender.js",
     "demo": "node bin/neonrender.js 'Hello, Neon'",
     "test": "vitest run",
-    "lint": "node -e \"console.log('Linting arrives in Step 4.');\""
+    "lint": "node -e \"console.log('Linting arrives in Step 4.');\"",
+    "check:examples": "node scripts/check_examples.js"
   },
   "engines": {
     "node": ">=18"

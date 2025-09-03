@@ -1,36 +1,52 @@
 ## neonrender
 
-Minimal scaffold (Step 2). Prints a neon-gradient message to your terminal.
+Neon text renderer for terminals. Prints high‑contrast gradients with a faux glow, optional animation, and export to ANSI/PNG.
 
-### Quickstart
+### Requirements
+- Node.js 18+ on macOS, Linux, or Windows Terminal.
 
+### Install & Run
 ```bash
 npm install
-npm run demo    # prints a neon "Hello, Neon"
+# Quick demo
+npm run demo
 
 # Or pass your own text
 node bin/neonrender.js "Information Beings"
 ```
 
-### Interactive mode
+### Usage
 ```bash
-node bin/neonrender.js -t "Hello" --interactive
-# Arrow keys: ←/→ cycle palettes, ↑/↓ cycle effects, q quits
+neonrender [text...] [options]
+
+Options:
+  -t, --text <text>          Text to render (overrides arg)
+      --font <name>          block (default)
+      --palette <name>       neon-violet | cyberpunk | matrix | amber
+      --effect <name>        shimmer|flicker|pulse|breathe|marquee|comet|wave|ripple|scanline|strobe|sparkle|none
+                              (combos allowed: shimmer+flicker, glow, pulse-glow)
+      --speed <n>            Effect speed (default: 1)
+      --intensity <0..1>     Effect intensity (default: 1)
+      --no-anim              Render a single static frame
+  -i,  --interactive         Arrow keys cycle palette/effect; q quits
+      --export <type|path>   ansi|png or a file path (infers type)
+      --out <file>           Output file path
 ```
 
-### What’s here now
-- Runnable CLI printing a truecolor gradient.
-- Defaults: violet → cyan gradient on dark terminals.
+### Examples
+- Static cyberpunk shimmer: `neonrender -t "Zaigood Labs" --palette cyberpunk --effect shimmer --no-anim`
+- ANSI export: `neonrender -t "Hello" --export ansi --out demo.ansi`
+- PNG export: `npm i canvas && neonrender -t "Hello" --export png --out hello.png`
+- Interactive: `neonrender -t "Hello" --interactive` (←/→ palettes, ↑/↓ effects, f toggles +flicker)
 
-### Roadmap (next steps)
-1. Gradient engine + fonts/palettes
-2. More palettes + effects (shimmer, flicker)
-3. Fallback logic + tests (vitest)
-4. Export (ansi, then png)
-5. Interactive mode (arrow keys; q to quit)
+### Palettes
+- neon-violet (default), cyberpunk-pinkblue (alias: cyberpunk), matrix-green (alias: matrix), neon-amber (alias: amber)
 
-### Export
-- ANSI: `neonrender -t "Hello" --export ansi --out demo.ansi`
-- Also accepted: `--export demo.ansi` (infers ANSI). The file contains ANSI escape sequences.
-- PNG (optional): install node-canvas first `npm i canvas`, then:
-  `neonrender -t "Hello" --export png --out hello.png`
+### How it Works (quick)
+- ASCII font via figlet → layered renderer draws a dim offset shadow + bright core → gradient across columns → effect modulates brightness over time.
+- Truecolor first with 256/16‑color fallback (auto‑detected).
+
+### Development
+- Layout: `bin/` entry, `src/cli.js`, `src/renderer/*` (palettes, effects, fonts, renderer), `src/util/*` (ansi, term), `src/exporters/*`.
+- Tests: `npm test` (vitest). Try `tests/*` for examples.
+- Contributing: see AGENTS.md for style, PR, and test expectations.

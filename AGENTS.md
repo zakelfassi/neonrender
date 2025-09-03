@@ -1,41 +1,44 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-- `bin/neonrender.js`: CLI entry. Keep this file tiny; delegate to `src/`.
-- `src/cli.js`: argument parsing and top‑level orchestration.
-- `src/renderer/*`: rendering strategies (palettes, effects, fonts). Add modules, don’t bloat `cli.js`.
-- `src/util/*`: color math, ANSI helpers, terminal detection.
-- `tests/*`: Vitest specs (rendering presence, fallbacks). 80%+ lines for core utils.
-- `demo/`: tiny scripts and sample outputs.
+## Project Structure & Ownership
+- `bin/neonrender.js`: CLI entry. Keep minimal; all logic in `src/`.
+- `src/cli.js`: argument parsing, I/O, orchestration only.
+- `src/renderer/*`: pure rendering strategies (palettes, effects, fonts, frame composer).
+- `src/util/*`: color math, ANSI/terminal helpers. No business logic here.
+- `src/exporters/*`: file exporters (ansi, png). Avoid side effects outside given path.
+- `tests/*`: vitest. Mirror source tree; keep tests close to utilities.
 
-## Build, Test, and Development Commands
-- `npm run demo`: print a neon “Hello, Neon”.
-- `node bin/neonrender.js "Your Text"`: run locally without install.
-- `npm test`: run unit tests (added in Step 5).
-- `npm run lint` / `npm run format`: lint/format once configured.
+## Build, Test, and Dev Commands
+- `npm run demo` – quick sanity render.
+- `node bin/neonrender.js "Your Text"` – local run without linking.
+- `npm test` – unit tests (ANSI presence, fallbacks, composition bounds).
+- Optional PNG: `npm i canvas` then `--export png`.
 
-## Coding Style & Naming Conventions
-- Language: Node.js (ESM). Indent 2 spaces, LF line endings.
-- Filenames: `kebab-case` for binaries, `camelCase` for functions, `PascalCase` for classes.
-- Keep modules small (≤200 LOC); prefer pure functions in `util/`.
-- Use ANSI constants and color math from `src/util/`—no inline escape codes.
+## Coding Style & Conventions
+- ESM, 2‑space indent, LF, no trailing spaces. Prefer pure functions and small modules (≤200 LOC).
+- Names: files `kebab-case`, functions `camelCase`, classes `PascalCase`.
+- Never inline escape codes—use helpers from `src/util/color.js`.
+- Favor data‑driven strategies (palettes/effects tables) over conditionals.
 
 ## Testing Guidelines
-- Framework: Vitest. Add tests for: ANSI presence, truecolor→256/16 fallback, and no-crash on wide glyphs.
-- Naming: mirror paths, e.g., `tests/util.color.test.js`.
-- Snapshot tests allowed for deterministic static renders; avoid for animations.
+- Minimum: tests for ANSI emission (24‑bit, 256, 16), effect range [0.5..1], and non‑crash on wide glyphs.
+- No snapshots for animations; static frames only. Keep tests <100ms each.
 
-## Commit & Pull Request Guidelines
-- Commits: Conventional Commits (`feat:`, `fix:`, `chore:`, `test:`). Scope example: `feat(renderer): add shimmer`.
-- PRs: include description, screenshots or ANSI capture, reproduction steps, and linked issue.
-- Keep PRs under ~400 lines diff; split by feature (renderer, effect, export).
+## Commit & PR Workflow
+- Conventional Commits: `feat:`, `fix:`, `chore:`, `refactor:`, `test:`. Scope example: `feat(effects): add ripple`.
+- One feature per PR (< ~400 lines). Include before/after screenshot or ANSI capture and tests.
+- CI (optional): run `npm test` on push/PR.
 
-## Security & Configuration Tips
-- Never execute untrusted input. Treat `--file` content as text only.
-- Detect terminal color depth via env (`COLORTERM`) or `tput`; fall back safely.
-- Support macOS/Linux/Windows Terminal; avoid shell‑specific escape sequences.
+## Architecture Notes
+- Renderer = layered compose: shadow (dim, offset) + core (bright) using column gradient.
+- Effect = function `(t,x,y)->[0..1]`; compose via `makeCompositeIntensity(names)`.
+- Palette = `[startRGB, endRGB]`. Add in `palettes.js`; expose alias if handy.
 
-## Agent-Specific Instructions
-- Add new palettes/effects via new modules, not conditionals.
-- Keep `Renderer` interface stable; add strategies (palette/effect/font) as plug‑ins under `styles/` when introduced.
+## Security & Performance
+- Treat all text as data. Never eval/exec. Avoid blocking I/O in the render loop.
+- Color depth autoselects (24/8/4). Ensure fallback paths stay readable on dark backgrounds.
 
+## How to Extend Quickly
+- Add effect: implement in `effects.js`, export via `listEffects()`, add a short test.
+- Add palette: extend `palettes.js` and alias map; update README palettes list.
+- Add exporter: create `src/exporters/<type>.js`, wire `--export` in `src/cli.js`.
