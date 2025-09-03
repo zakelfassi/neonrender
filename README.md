@@ -6,6 +6,11 @@ Neon text renderer for terminals. Prints high‑contrast gradients with a faux g
 ![release-please](https://img.shields.io/github/actions/workflow/status/zakelfassi/neonrender/release-please.yml?label=release)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
+<video width="100%" controls>
+  <source src="demo/neonrender.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
 ### Requirements
 - Node.js 18+ on macOS, Linux, or Windows Terminal.
 
