@@ -2,7 +2,7 @@ import { resolvePalette } from "./renderer/palettes.js";
 import { renderFont } from "./renderer/fonts.js";
 import { renderNeon, renderNeonFrame } from "./renderer/renderer.js";
 import { Command } from "commander";
-import { makeIntensity, listEffects } from "./renderer/effects.js";
+import { makeIntensity, listEffects, makeCompositeIntensity, parseEffectSpec, listEffectPresets } from "./renderer/effects.js";
 import { hideCursor, showCursor, moveCursorUp, detectColorSupport } from "./util/term.js";
 import { writeAnsiFile } from "./exporters/ansi.js";
 
@@ -15,7 +15,7 @@ export async function main() {
     .option("-t, --text <text>", "text to render (overrides arg)")
     .option("--font <name>", "font style (block)", "block")
     .option("--palette <name>", "palette name (neon-violet)", "neon-violet")
-    .option("--effect <name>", "effect: shimmer|flicker|none", "shimmer")
+    .option("--effect <name>", "effect or combo (e.g. shimmer, flicker, pulse, shimmer+flicker, glow)", "shimmer")
     .option("--speed <n>", "effect speed (1)", parseFloat, 1)
     .option("--intensity <0..1>", "effect intensity (1)", parseFloat, 1)
     .option("--no-anim", "render a single static frame")
@@ -66,9 +66,11 @@ export async function main() {
 
   // Animated path
   const width = Math.max(...lines.map((l) => l.length), 1);
-  const intensityAtFactory = makeIntensity(opts.effect, width, {
+  const spec = parseEffectSpec(opts.effect);
+  const intensityAtFactory = makeCompositeIntensity(spec, width, {
     intensity: opts.intensity,
     speed: opts.speed,
+    height: lines.length,
   });
 
   let prevLines = 0;
@@ -127,8 +129,9 @@ async function runInteractive({ text, font, paletteName, effect }) {
   const { listPalettes, resolvePalette } = await import("./renderer/palettes.js");
   const paletteNames = listPalettes();
   let paletteIndex = Math.max(0, paletteNames.indexOf(paletteName));
-  const effects = listEffects();
-  let effectIndex = Math.max(0, effects.indexOf(effect));
+  const baseEffects = listEffects();
+  let effectIndex = Math.max(0, baseEffects.indexOf(effect));
+  let comboFlicker = false; // overlay toggle
   let speed = 1;
   let intensity = 1;
 
@@ -136,7 +139,10 @@ async function runInteractive({ text, font, paletteName, effect }) {
   const lines = renderFont(text, font);
   const width = Math.max(...lines.map((l) => l.length), 1);
   const depth = detectColorSupport();
-  let make = () => makeIntensity(effects[effectIndex], width, { speed, intensity });
+  let make = () => {
+    const names = [baseEffects[effectIndex]].concat(comboFlicker ? ["flicker"] : []);
+    return makeCompositeIntensity(names, width, { speed, intensity, height: lines.length });
+  };
   let intensityAtFactory = make();
 
   let prevLines = 0;
@@ -152,7 +158,7 @@ async function runInteractive({ text, font, paletteName, effect }) {
   stdin.resume();
   stdin.setEncoding("utf8");
 
-  const helpLine = () => `\x1b[2K\r←/→ palette: ${paletteNames[paletteIndex]}  ↑/↓ effect: ${effects[effectIndex]}  q: quit`;
+  const helpLine = () => `\x1b[2K\r←/→ palette: ${paletteNames[paletteIndex]}  ↑/↓ effect: ${baseEffects[effectIndex]}${comboFlicker?'+flicker':''}  (f toggles flicker)  q: quit`;
 
   const tick = () => {
     const t = (Date.now() - startMs) / 1000;
@@ -182,10 +188,13 @@ async function runInteractive({ text, font, paletteName, effect }) {
       paletteIndex = (paletteIndex + 1) % paletteNames.length;
       [start, end] = resolvePalette(paletteNames[paletteIndex]);
     } else if (ch === '\u001b[A') { // up
-      effectIndex = (effectIndex + 1) % effects.length;
+      effectIndex = (effectIndex + 1) % baseEffects.length;
       intensityAtFactory = make();
     } else if (ch === '\u001b[B') { // down
-      effectIndex = (effectIndex - 1 + effects.length) % effects.length;
+      effectIndex = (effectIndex - 1 + baseEffects.length) % baseEffects.length;
+      intensityAtFactory = make();
+    } else if (ch === 'f' || ch === 'F') {
+      comboFlicker = !comboFlicker;
       intensityAtFactory = make();
     }
   };
