@@ -1,0 +1,13 @@
+area/cli:
+  - changed-files:
+      - any-glob-to-any-file: ['src/cli.js','bin/**']
+area/renderer:
+  - changed-files:
+      - any-glob-to-any-file: ['src/renderer/**']
+area/util:
+  - changed-files:
+      - any-glob-to-any-file: ['src/util/**']
+area/docs:
+  - changed-files:
+      - any-glob-to-any-file: ['README.md','AGENTS.md','**/*.md']
+

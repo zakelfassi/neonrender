@@ -4,6 +4,16 @@
   "private": false,
   "type": "module",
   "description": "Render neon-style gradients and glow in your terminal.",
+  "license": "MIT",
+  "homepage": "https://github.com/zakelfassi/neonrender#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zakelfassi/neonrender.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zakelfassi/neonrender/issues"
+  },
+  "author": "zakelfassi <zak@zaigood.com>",
   "bin": {
     "neonrender": "bin/neonrender.js"
   },
@@ -17,6 +27,15 @@
   "engines": {
     "node": ">=18"
   },
+  "keywords": [
+    "cli",
+    "ansi",
+    "neon",
+    "gradient",
+    "terminal",
+    "ascii",
+    "figlet"
+  ],
   "dependencies": {
     "commander": "^11.1.0",
     "figlet": "^1.6.0"
@@ -26,5 +45,14 @@
   },
   "optionalDependencies": {
     "canvas": "^2.11.2"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }

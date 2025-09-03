@@ -2,6 +2,10 @@
 
 Neon text renderer for terminals. Prints high‑contrast gradients with a faux glow, optional animation, and export to ANSI/PNG.
 
+![CI](https://img.shields.io/github/actions/workflow/status/zakelfassi/neonrender/ci.yml?branch=main)
+![release-please](https://img.shields.io/github/actions/workflow/status/zakelfassi/neonrender/release-please.yml?label=release)
+![license](https://img.shields.io/badge/license-MIT-blue)
+
 ### Requirements
 - Node.js 18+ on macOS, Linux, or Windows Terminal.
 
@@ -50,3 +54,10 @@ Options:
 - Layout: `bin/` entry, `src/cli.js`, `src/renderer/*` (palettes, effects, fonts, renderer), `src/util/*` (ansi, term), `src/exporters/*`.
 - Tests: `npm test` (vitest). Try `tests/*` for examples.
 - Contributing: see AGENTS.md for style, PR, and test expectations.
+
+### Releasing (GitHub)
+- Conventional Commits drive automated releases via Release Please.
+- Merge PRs to `main`; the bot will open a release PR. When merged, a GitHub Release is created.
+- Optional npm publish: add `NPM_TOKEN` repo secret; publish runs on release tag.
+
+Repository: https://github.com/zakelfassi/neonrender
