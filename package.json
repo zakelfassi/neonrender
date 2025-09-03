@@ -1,6 +1,6 @@
 {
   "name": "neonrender",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "private": false,
   "type": "module",
   "description": "Render neon-style gradients and glow in your terminal.",
