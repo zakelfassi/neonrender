@@ -6,10 +6,11 @@ Neon text renderer for terminals. Prints high‑contrast gradients with a faux g
 ![release-please](https://img.shields.io/github/actions/workflow/status/zakelfassi/neonrender/release-please.yml?label=release)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
-<video width="100%" controls>
-  <source src="demo/neonrender.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+<p align="center">
+  <img src="demo/neonrender.gif" alt="neonrender demo" width="80%">
+</p>
+
+*Demo showing neonrender effects and palettes in action*
 
 ### Requirements
 - Node.js 18+ on macOS, Linux, or Windows Terminal.
@@ -62,7 +63,11 @@ Options:
 
 ### Releasing (GitHub)
 - Conventional Commits drive automated releases via Release Please.
-- Merge PRs to `main`; the bot will open a release PR. When merged, a GitHub Release is created.
-- Optional npm publish: add `NPM_TOKEN` repo secret; publish runs on release tag.
+- Merge PRs to `main`; the bot opens a release PR. When merged, a GitHub Release is created.
+- npm publish: add `NPM_TOKEN` repo secret; publish runs on release tag.
+
+Setup notes (fixes common permission error)
+- Repo Settings → Actions → General → Workflow permissions: select “Read and write permissions” and check “Allow GitHub Actions to create and approve pull requests”.
+- Create a fine‑grained PAT with repo:contents and repo:pull_requests (or classic `repo`) and add it as `RELEASE_PLEASE_TOKEN` secret for the Release Please workflow.
 
 Repository: https://github.com/zakelfassi/neonrender
