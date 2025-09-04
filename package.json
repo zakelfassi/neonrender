@@ -37,7 +37,7 @@
     "figlet"
   ],
   "dependencies": {
-    "commander": "^11.1.0",
+    "commander": "^14.0.0",
     "figlet": "^1.6.0"
   },
   "devDependencies": {
